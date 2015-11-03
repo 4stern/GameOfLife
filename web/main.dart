@@ -16,8 +16,6 @@ void main() {
     );
     gol.rules.add(new AwakeRule());
     gol.rules.add(new DieRule());
-    gol.start();
-
 
     InputElement delaySlider = new InputElement();
     delaySlider.type = "range";
@@ -36,7 +34,6 @@ void main() {
     });
 
     DivElement cyclesCounter = new DivElement();
-
     gol.loops.add((num time){
         cyclesCounter.text = gol.cycles.toString();
     });
@@ -45,4 +42,5 @@ void main() {
     document.body.nodes.add(delaySlider);
     document.body.nodes.add(reset);
 
+    gol.start();
 }
