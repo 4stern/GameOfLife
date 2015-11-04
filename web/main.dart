@@ -28,9 +28,27 @@ void main() {
     });
 
     ButtonElement reset = new ButtonElement();
-    reset.text="reset";
+    reset.text="random";
     reset.onClick.listen((e){
         gol.randomizeField();
+    });
+
+    ButtonElement startStop = new ButtonElement();
+    startStop.text="start";
+    startStop.onClick.listen((e){
+        if (gol.runs == true) {
+            startStop.text="start";
+            gol.stop();
+        } else {
+            startStop.text="stop";
+            gol.start();
+        }
+    });
+
+    ButtonElement clear = new ButtonElement();
+    clear.text="clear";
+    clear.onClick.listen((e){
+        gol.clearField();
     });
 
     DivElement cyclesCounter = new DivElement();
@@ -41,6 +59,8 @@ void main() {
     document.body.nodes.add(cyclesCounter);
     document.body.nodes.add(delaySlider);
     document.body.nodes.add(reset);
+    document.body.nodes.add(clear);
+    document.body.nodes.add(startStop);
 
-    gol.start();
+    // gol.start();
 }

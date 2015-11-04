@@ -10,6 +10,7 @@ class GameOfLife extends Engine{
 
     num widthFactor;
     num heightFactor;
+    Point hoverCoords;
 
     GameOfLife({int sizeX, int sizeY, int fieldX, int fieldY}) {
 
@@ -24,30 +25,86 @@ class GameOfLife extends Engine{
 
         _createField();
         _conntectNodes();
-        randomizeField();
+
 
         loops.add(_loop);
+        alwaysLoop.add(_alwaysLoop);
 
         canvas.onClick.listen((event){
+            Point p = getNodeCoords(event);
+            onNodeClick(field[p.x][p.y]);
+        });
+        canvas.onMouseMove.listen((event){
             int offsetY = canvas.offsetTop;
             int offsetX = canvas.offsetLeft;
             int x = event.page.x - offsetX - 1;
             int y = event.page.y - offsetY - 1;
+            hoverCoords = new Point(x,y);
+        });
+        canvas.onMouseOut.listen((event) => hoverCoords = null);
+        canvas.onMouseLeave.listen((event) => hoverCoords = null);
+
+        randomizeField();
+    }
+    List<List<int>> pattern = [
+        [1,0],
+        [1,1],
+        [2,1],
+        [0,2]
+    ];
+    void _showHover(){
+        if (hoverCoords != null) {
+            int x = hoverCoords.x;
+            int y = hoverCoords.y;
+            //Point p = getNodeCoords(event);
+            //print(hoverCoords.x.toString());
+            // context2D.beginPath();
+            // context2D.setStrokeColorRgb(0,0,0);
+            // context2D.arc(hoverCoords.x, hoverCoords.y, 10, 0, 2*PI);
+            // context2D.stroke();
 
             int elementX = (x/widthFactor).floor();
             int elementY = (y/heightFactor).floor();
 
-            // print('x: '+x.toString()+' / y:'+y.toString());
-            // print('x: '+elementX.toString()+' / y:'+elementY.toString());
+            context2D.setStrokeColorRgb(255,0,0);
+            context2D.setFillColorRgb(255,0,0);
+            context2D.fillRect(
+                elementX*widthFactor, elementY*heightFactor,
+                widthFactor,heightFactor
+            );
 
-            onNodeClick(field[elementX][elementY]);
-        });
+            pattern.forEach((List<int> coords){
+                context2D.fillRect(
+                    (elementX+coords[0])*widthFactor, (elementY+coords[1])*heightFactor,
+                    widthFactor,heightFactor
+                );
+            });
+
+        }
     }
 
     void onNodeClick(Node node){
-        node.nextAliveState = true;
-        node.alive = true;
+        node.alive = !node.alive;
+        node.nextAliveState = node.alive;
         _renderNode(node);
+
+        pattern.forEach((List<int> coords){
+            Node n = field[node.x+coords[0]][node.y+coords[1]];
+            n.alive = true;
+            n.nextAliveState = true;
+            _renderNode(n);
+        });
+    }
+
+    Point getNodeCoords(MouseEvent event){
+        int offsetY = canvas.offsetTop;
+        int offsetX = canvas.offsetLeft;
+        int x = event.page.x - offsetX - 1;
+        int y = event.page.y - offsetY - 1;
+        int elementX = (x/widthFactor).floor();
+        int elementY = (y/heightFactor).floor();
+        Point point = new Point(elementX, elementY);
+        return point;
     }
 
     void forEachNode(callback(Node node)){
@@ -150,13 +207,29 @@ class GameOfLife extends Engine{
         Random rnd = new Random();
         forEachNode((Node node){
             node.alive = rnd.nextBool();
+            node.nextAliveState = node.alive;
         });
+        _loop(0);
+        stop();
+    }
+
+    void clearField(){
+        forEachNode((Node node){
+            node.alive = false;
+        });
+        _loop(0);
+        stop();
     }
 
     void _loop(num time){
         _prepareNextState();
         _tipOverNextState();
+
+    }
+
+    void _alwaysLoop(num time){
         _render();
+        _showHover();
     }
 
     void _prepareNextState(){
