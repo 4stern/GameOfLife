@@ -1,10 +1,16 @@
 part of game_of_life;
 
 abstract class Rule {
+    GameOfLife gol;
+    Rule(this.gol);
+
     bool execute (Node node);
 }
 
-class AwakeRule implements Rule {
+class AwakeRule extends Rule {
+
+    AwakeRule(GameOfLife gol) : super(gol);
+
     bool execute (Node node){
         bool hasAffected = false;
 
@@ -20,7 +26,10 @@ class AwakeRule implements Rule {
     }
 }
 
-class DieRule implements Rule {
+class DieRule extends Rule {
+
+    DieRule(GameOfLife gol) : super(gol);
+
     bool execute (Node node){
         bool hasAffected = false;
 

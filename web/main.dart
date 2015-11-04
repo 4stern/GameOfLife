@@ -14,8 +14,8 @@ void main() {
         sizeX: 500, sizeY: 500,
         fieldX: 50, fieldY: 50
     );
-    gol.rules.add(new AwakeRule());
-    gol.rules.add(new DieRule());
+    gol.rules.add(new AwakeRule(gol));
+    gol.rules.add(new DieRule(gol));
 
     InputElement delaySlider = new InputElement();
     delaySlider.type = "range";
