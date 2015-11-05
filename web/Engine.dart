@@ -18,7 +18,6 @@ abstract class Engine {
     void start() {
         if (runs == false) {
             runs = true;
-            window.requestAnimationFrame(_update);
         }
     }
 
