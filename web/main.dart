@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:math';
 import 'dart:async';
 
+part 'Pattern.dart';
 part 'Engine.dart';
 part 'Rules.dart';
 part 'Node.dart';
@@ -12,7 +13,7 @@ part 'GameOfLife.dart';
 void main() {
     GameOfLife gol = new GameOfLife(
         sizeX: 500, sizeY: 500,
-        fieldX: 50, fieldY: 50
+        fieldX: 100, fieldY: 100
     );
     gol.rules.add(new AwakeRule(gol));
     gol.rules.add(new DieRule(gol));
@@ -56,11 +57,29 @@ void main() {
         cyclesCounter.text = gol.cycles.toString();
     });
 
+    SelectElement patternList = new SelectElement();
+    gol.patternList.pattern.forEach((name, pattern){
+        OptionElement option = new OptionElement();
+        option.text = name;
+        option.value = name;
+        patternList.add(option, 0);
+    });
+    patternList.onChange.listen((event){
+        String patternName = patternList.selectedOptions[0].value;
+        gol.pattern = gol.patternList.pattern[patternName];
+    });
+    patternList.selectedIndex = 0;
+    String patternName = patternList.selectedOptions[0].value;
+    gol.pattern = gol.patternList.pattern[patternName];
+
+
+
     document.body.nodes.add(cyclesCounter);
     document.body.nodes.add(delaySlider);
     document.body.nodes.add(reset);
     document.body.nodes.add(clear);
     document.body.nodes.add(startStop);
+    document.body.nodes.add(patternList);
 
     // gol.start();
 }

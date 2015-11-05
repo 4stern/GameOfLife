@@ -1,6 +1,7 @@
 canvas {
     border: 1px solid black;
+    cursor: none;
 }
-input {
+input, select {
     display: block;
 }

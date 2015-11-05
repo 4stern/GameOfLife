@@ -12,6 +12,9 @@ class GameOfLife extends Engine{
     num heightFactor;
     Point hoverCoords;
 
+    Pattern patternList = new Pattern();
+    List<List<int>> pattern;
+
     GameOfLife({int sizeX, int sizeY, int fieldX, int fieldY}) {
 
         size = new Point(sizeX, sizeY);
@@ -45,54 +48,51 @@ class GameOfLife extends Engine{
         canvas.onMouseLeave.listen((event) => hoverCoords = null);
 
         randomizeField();
+
+        pattern = patternList.pattern["glider"];
     }
-    List<List<int>> pattern = [
-        [1,0],
-        [1,1],
-        [2,1],
-        [0,2]
-    ];
+
+    void _drawPattern(List<List<int>> pattern, int elementX, int elementY){
+        context2D.setStrokeColorRgb(255,0,0);
+        context2D.setFillColorRgb(255,0,0);
+        for(int y=0; y < pattern.length; y++) {
+            for(int x=0; x < pattern[y].length; x++) {
+                if (pattern[y][x]==1) context2D.fillRect(
+                    (elementX+x)*widthFactor, (elementY+y)*heightFactor,
+                    widthFactor,heightFactor
+                );
+            }
+        }
+    }
+
+    List<Node> _affectedPatternNodes(Node baseNode, List<List<int>> pattern){
+        List<Node> list = new List<Node>();
+        for(int y=0; y < pattern.length; y++) {
+            for(int x=0; x < pattern[y].length; x++) {
+                if (pattern[y][x]==1) {
+                    list.add(field[baseNode.x+x][baseNode.y+y]);
+                }
+            }
+        }
+        return list;
+    }
+
     void _showHover(){
         if (hoverCoords != null) {
             int x = hoverCoords.x;
             int y = hoverCoords.y;
-            //Point p = getNodeCoords(event);
-            //print(hoverCoords.x.toString());
-            // context2D.beginPath();
-            // context2D.setStrokeColorRgb(0,0,0);
-            // context2D.arc(hoverCoords.x, hoverCoords.y, 10, 0, 2*PI);
-            // context2D.stroke();
-
             int elementX = (x/widthFactor).floor();
             int elementY = (y/heightFactor).floor();
 
-            context2D.setStrokeColorRgb(255,0,0);
-            context2D.setFillColorRgb(255,0,0);
-            context2D.fillRect(
-                elementX*widthFactor, elementY*heightFactor,
-                widthFactor,heightFactor
-            );
-
-            pattern.forEach((List<int> coords){
-                context2D.fillRect(
-                    (elementX+coords[0])*widthFactor, (elementY+coords[1])*heightFactor,
-                    widthFactor,heightFactor
-                );
-            });
-
+            _drawPattern(pattern, elementX, elementY);
         }
     }
 
     void onNodeClick(Node node){
-        node.alive = !node.alive;
-        node.nextAliveState = node.alive;
-        _renderNode(node);
-
-        pattern.forEach((List<int> coords){
-            Node n = field[node.x+coords[0]][node.y+coords[1]];
-            n.alive = true;
-            n.nextAliveState = true;
-            _renderNode(n);
+        _affectedPatternNodes(node, pattern).forEach((Node affectedNode){
+            affectedNode.alive = true;
+            affectedNode.nextAliveState = true;
+            _renderNode(affectedNode);
         });
     }
 

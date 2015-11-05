@@ -16,12 +16,16 @@ abstract class Engine {
     }
 
     void start() {
-        runs = true;
-        window.requestAnimationFrame(_update);
+        if (runs == false) {
+            runs = true;
+            window.requestAnimationFrame(_update);
+        }
     }
 
     void stop() {
-        runs = false;
+        if (runs == true) {
+            runs = false;
+        }
     }
 
     void _update(num time) {
